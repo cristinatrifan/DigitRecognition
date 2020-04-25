@@ -14,7 +14,7 @@ public class Main {
        obj.calcOutput(getListWeights(), obj.interpretCellvalues());
 
     }
-//test comment
+
     public static List<Integer> getListWeights() {
         return listWeights;
     }
