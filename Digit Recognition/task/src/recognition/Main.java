@@ -10,7 +10,7 @@ public class Main {
 
         System.out.println("Input grid: ");
 
-       //calculate output based on weights and cells values
+       //calculate output based on weights and cells values //
        obj.calcBestFit(obj.interpretCellvalues());
     }
 
