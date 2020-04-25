@@ -5,32 +5,48 @@ public class Main {
     public static void main(String[] args) {
        Main obj = new Main();
 
-       //create an immutable map with the weights values
+       //create immutable lists with the weights values
        Main.createWeights();
 
         System.out.println("Input grid: ");
-       //get the state of cells an map them in an Array with values 0 or 1
+
        //calculate output based on weights and cells values
-       obj.calcOutput(getListWeights(), obj.interpretCellvalues());
-
+       obj.calcBestFit(obj.interpretCellvalues());
     }
 
-    public static List<Integer> getListWeights() {
-        return listWeights;
-    }
-
-    public static void setListWeights(List<Integer> listWeights) {
-        Main.listWeights = listWeights;
-    }
-
-    private static List<Integer> listWeights;
+    private static List<Integer> listWeights0;
+    private static List<Integer> listWeights1;
+    private static List<Integer> listWeights2;
+    private static List<Integer> listWeights3;
+    private static List<Integer> listWeights4;
+    private static List<Integer> listWeights5;
+    private static List<Integer> listWeights6;
+    private static List<Integer> listWeights7;
+    private static List<Integer> listWeights8;
+    private static List<Integer> listWeights9;
 
     private static void createWeights() {
-        List<Integer> listWeights = List.of(
-                //9 weights and a bias
-                2, 1, 2, 4, -4, 4, 2, -1, 2, -5
-        );
-      setListWeights(listWeights);
+        //15 weights and a bias - immutable lists
+        listWeights0 = List.of(
+                1,1,1,1,-1,1,1,-1,1,1,-1,1,1,1,1,-1);
+        listWeights1 = List.of(
+                -1,1,-1,-1,1,-1,-1,1,-1,-1,1,-1,-1,1,-1,6);
+        listWeights2 = List.of(
+                1,1,1,-1,-1,1,1,1,1,1,-1,-1,1,1,1,1);
+        listWeights3 = List.of(
+                1,1,1,-1,-1,1,1,1,1,-1,-1,1,1,1,1,0);
+        listWeights4 = List.of(
+                1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,-1,1,2);
+        listWeights5 = List.of(
+                1,1,1,1,-1,-1,1,1,1,-1,-1,1,1,1,1,0);
+        listWeights6 = List.of(
+                1,1,1,1,-1,-1,1,1,1,1,-1,1,1,1,1,-1);
+        listWeights7 = List.of(
+                1,1,1,-1,-1,1,-1,-1,1,-1,-1,1,-1,-1,1,3);
+        listWeights8 = List.of(
+                1,1,1,1,-1,1,1,1,1,1,-1,1,1,1,1,-2);
+        listWeights9 = List.of(
+                1,1,1,1,-1,1,1,1,1,-1,-1,1,1,1,1,-1);
     }
 
     private ArrayList<Integer> interpretCellvalues() {
@@ -51,22 +67,36 @@ public class Main {
         return cellValues;
     }
 
-    private void calcOutput(List<Integer> listWeighs,
+    private int calcOutput(List<Integer> listWeighs,
                             ArrayList<Integer> cellValues) {
 
         int output = 0;
         int index = 0 ;
 
-        while (index < 9) {
+        while (index < 15) {
             output += listWeighs.get(index) * cellValues.get(index);
             index++;
         }
-        output += listWeighs.get(9);
+        output += listWeighs.get(15);
+        return output;
+    }
 
-        int out = (output > 0)
-                ? 0
-                : 1;
+    private void calcBestFit(ArrayList<Integer> cellValues) {
+           TreeMap<Integer, Integer> allOutputs
+                   = new TreeMap<Integer, Integer>();
 
-        System.out.println("This number is " + out);
+        allOutputs.put(this.calcOutput(listWeights0, cellValues), 0);
+        allOutputs.put(this.calcOutput(listWeights1, cellValues), 1);
+        allOutputs.put(this.calcOutput(listWeights2, cellValues), 2);
+        allOutputs.put(this.calcOutput(listWeights3, cellValues), 3);
+        allOutputs.put(this.calcOutput(listWeights4, cellValues), 4);
+        allOutputs.put(this.calcOutput(listWeights5, cellValues), 5);
+        allOutputs.put(this.calcOutput(listWeights6, cellValues), 6);
+        allOutputs.put(this.calcOutput(listWeights7, cellValues), 7);
+        allOutputs.put(this.calcOutput(listWeights8, cellValues), 8);
+        allOutputs.put(this.calcOutput(listWeights9, cellValues), 9);
+
+        System.out.println("This number is "
+                + allOutputs.lastEntry().getValue());
     }
 }
