@@ -96,6 +96,7 @@ public class Main {
         Map<Integer, List<Double>> mapDeltaWeights = new HashMap<>();
 
         // for each output neuron
+
         for (int i = 0; i < 10; i++) {
             List<Double> listdeltaWeights = new ArrayList<>();
             //for each ideal value of gridcells of the neuron
