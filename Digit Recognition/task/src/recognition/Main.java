@@ -1,10 +1,9 @@
 package recognition;
-import java.io.CharArrayWriter;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
        Main obj = new Main();
        int i = 0;
 
@@ -12,63 +11,52 @@ public class Main {
         System.out.println("2. Guess a number");
         System.out.println("Your choice: ");
 
-        try (Scanner scanner = new Scanner(System.in)) {
+        Scanner scanner = new Scanner(System.in);
             if (scanner.hasNextInt()) {
                 i = scanner.nextInt();
             }
-        }
-        catch (Exception e) {
-            System.out.println("Please enter 1 or 2");
-        }
 
         if (i == 1) {
-            //create random initial weights
+            //create random initial weights/read already existing weights
             //calculate output neurons
             //calculate delta weight for each possible grid - use file with weights
             //save weights to file
 
             createCellsGrid();
-            obj.createInitialRandomWeights();
+            obj.createInitialWeights();
             obj.writeDeltaWeights(obj.calculateDeltaWeights(obj.calculateOutputNeurons()));
 
         }
+
         else if (i == 2) {
+            System.out.println("Input grid: ");
 
-       //create immutable lists with the weights values
-       Main.createWeights();// will change with weights from file
-
-        System.out.println("Input grid: ");
+       //create/read immutable lists with the weights values from file
+       obj.createWeights();
 
        //calculate output based on weights and cells values
-       obj.calcBestFit(obj.interpretCellvalues());//will use sigmoid instead of bias
+       obj.calcBestFit(obj.interpretCellValues(scanner));
         }
-
     }
 
- //   public static List<Integer> getListWeights() { return listWeights; }
- //   public static void setListWeights(List<Integer> listWeights) {Main.listWeights = listWeights;}
-
-    private static List<Integer> listWeights0;
-    private static List<Integer> listWeights1;
-    private static List<Integer> listWeights2;
-    private static List<Integer> listWeights3;
-    private static List<Integer> listWeights4;
-    private static List<Integer> listWeights5;
-    private static List<Integer> listWeights6;
-    private static List<Integer> listWeights7;
-    private static List<Integer> listWeights8;
-    private static List<Integer> listWeights9;
-
     private static Map<Integer, List<Integer>> mapCellsGrid;
+    private Map<Integer, List<Double>> initialWeights;
 
-    private List<Double> initialRandomWeights;
+    private void createInitialWeights() throws FileNotFoundException {
 
-    private void createInitialRandomWeights() {
-        Random random = new Random();
-        initialRandomWeights = new ArrayList<>();
+        initialWeights = this.readDeltaWeights();
+        if (initialWeights.size() <= 1) {
 
-        for (int i = 0; i < 15; i++) {
-            initialRandomWeights.add(random.nextDouble());
+   // Random random = new Random();
+
+    for (int i = 0; i < 10; i++) {
+        List<Double> initialWeightsList = new ArrayList<>();
+        for (int j = 0; j < 15; j++) {
+  //          initialWeightsList.add(random.nextDouble());
+            initialWeightsList.add(0.0);
+        }
+        initialWeights.put(i, initialWeightsList);
+             }
         }
     }
 
@@ -80,7 +68,7 @@ public class Main {
         for (int i = 0; i < 10; i++) {
             Double outputNeuron = 0.0;
             for (int j = 0; j < 15; j++) {
-                outputNeuron += mapCellsGrid.get(i).get(j) * initialRandomWeights.get(j);
+                outputNeuron += mapCellsGrid.get(i).get(j) * initialWeights.get(i).get(j);
             }
             //transform outputNeuron with sigmoid function
             outputNeuron = 1 / (1 + Math.pow(Math.E, -outputNeuron));
@@ -107,7 +95,7 @@ public class Main {
                         deltaanon =+ 0.5 * mapCellsGrid.get(k).get(j)
                             * (mapCellsGrid.get(i).get(j) - outputNeurons.get(i));
                 }
-                    deltaanon = deltaanon / 10;
+                    deltaanon = initialWeights.get(i).get(j) + deltaanon / 10;
                     listdeltaWeights.add(deltaanon);
             }
                 mapDeltaWeights.put(i, listdeltaWeights);
@@ -117,13 +105,20 @@ public class Main {
     }
 
     private void writeDeltaWeights(Map<Integer, List<Double>> mapDeltaWeights) {
-        //C:\Users\3058\OneDrive - Q_PERIOR AG\Desktop\Inspiri\orga\deltaWeights.docx
 
         try (FileWriter writer = new FileWriter("C:/Users/3058/OneDrive - Q_PERIOR AG/Desktop/Inspiri/orga/deltaWeights.txt", false)) {
 
             for (var item : mapDeltaWeights.entrySet()) {
                  writer.write(item.getKey().toString());
-                 writer.write(item.getValue().toString());
+                 writer.write("  ");
+                 item.getValue().forEach(x -> {
+                     try {
+                         writer.write(" " + x.toString() + " ");
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                 });
+                 writer.write("  ");
             }
 
           System.out.println(mapDeltaWeights.toString());
@@ -133,28 +128,30 @@ public class Main {
         }
     }
 
-    private static void createWeights() {
-        //15 weights and a bias
-        listWeights0 = List.of(
-                1,1,1,1,-1,1,1,-1,1,1,-1,1,1,1,1,-1,0);
-        listWeights1 = List.of(
-                -1,1,-1,-1,1,-1,-1,1,-1,-1,1,-1,-1,1,-1,6,1);
-        listWeights2 = List.of(
-                1,1,1,-1,-1,1,1,1,1,1,-1,-1,1,1,1,1,2);
-        listWeights3 = List.of(
-                1,1,1,-1,-1,1,1,1,1,-1,-1,1,1,1,1,0,3);
-        listWeights4 = List.of(
-                1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,-1,1,2,4);
-        listWeights5 = List.of(
-                1,1,1,1,-1,-1,1,1,1,-1,-1,1,1,1,1,0,5);
-        listWeights6 = List.of(
-                1,1,1,1,-1,-1,1,1,1,1,-1,1,1,1,1,-1,6);
-        listWeights7 = List.of(
-                1,1,1,-1,-1,1,-1,-1,1,-1,-1,1,-1,-1,1,3,7);
-        listWeights8 = List.of(
-                1,1,1,1,-1,1,1,1,1,1,-1,1,1,1,1,-2,8);
-        listWeights9 = List.of(
-                1,1,1,1,-1,1,1,1,1,-1,-1,1,1,1,1,-1,9);
+    private Map<Integer, List<Double>> readDeltaWeights() throws FileNotFoundException {
+        //deltaWeightsFile
+        Map<Integer, List<Double>> deltaWeightsTempFile = new HashMap<Integer, List<Double>>();
+        File file = new File("C:/Users/3058/OneDrive - Q_PERIOR AG/Desktop/Inspiri/orga/deltaWeights.txt");
+        Scanner scanner = new Scanner(file);
+
+        for (int i = 0; i < 10; i++) {
+            int neuron = 0;
+            List<Double> list = new ArrayList<>();
+
+            if (scanner.hasNextInt()) {
+                neuron = scanner.nextInt();
+            }
+
+            for (int j = 0; j < 15; j++) {
+                if (scanner.hasNextDouble()) {
+                    list.add(scanner.nextDouble());
+                }
+            }
+            deltaWeightsTempFile.put(neuron, list);
+        }
+
+        scanner.close();
+        return deltaWeightsTempFile;
     }
 
     private static void createCellsGrid() {
@@ -184,52 +181,54 @@ public class Main {
         );
     }
 
-    private ArrayList<Integer> interpretCellvalues() {
-        Scanner scanner = new Scanner(System.in);
+    private void createWeights() throws FileNotFoundException {
+        //10neurons x 15 weights - read from file
+
+        initialWeights = this.readDeltaWeights();
+
+    }
+
+    private ArrayList<Integer> interpretCellValues(Scanner scanner) {
         String str = "";
         ArrayList<Integer> cellValues = new ArrayList<>();
 
-        while (scanner.hasNextLine()){
-            str = scanner.nextLine();
-            for (int i = 0; i < str.length(); i++) {
-               if (String.valueOf(str.charAt(i)).equals("X")) {
-                   cellValues.add(1);
-               } else {
-                   cellValues.add(0);
-               }
+            while (scanner.hasNextLine()) {
+                str = scanner.nextLine();
+                for (int i = 0; i < str.length(); i++) {
+                    if (String.valueOf(str.charAt(i)).equals("X")) {
+                        cellValues.add(1);
+                    } else {
+                        cellValues.add(0);
+                    }
+                }
             }
-        }
+
+            scanner.close();
         return cellValues;
     }
 
-    private int calcOutput(List<Integer> listWeighs,
+    private Double calcOutput(List<Double> listWeighs,
                             ArrayList<Integer> cellValues) {
 
-        int output = 0;
+        Double output = 0.0;
         int index = 0 ;
 
         while (index < 15) {
             output += listWeighs.get(index) * cellValues.get(index);
             index++;
         }
-        output += listWeighs.get(15);
+
+        output = 1 / (1 + Math.pow(Math.E, -output));
         return output;
     }
 
     private void calcBestFit(ArrayList<Integer> cellValues) {
-           TreeMap<Integer, Integer> allOutputs
-                   = new TreeMap<Integer, Integer>();
+           TreeMap<Double, Integer> allOutputs
+                   = new TreeMap<Double, Integer>();
 
-        allOutputs.put(this.calcOutput(listWeights0, cellValues), 0);
-        allOutputs.put(this.calcOutput(listWeights1, cellValues), 1);
-        allOutputs.put(this.calcOutput(listWeights2, cellValues), 2);
-        allOutputs.put(this.calcOutput(listWeights3, cellValues), 3);
-        allOutputs.put(this.calcOutput(listWeights4, cellValues), 4);
-        allOutputs.put(this.calcOutput(listWeights5, cellValues), 5);
-        allOutputs.put(this.calcOutput(listWeights6, cellValues), 6);
-        allOutputs.put(this.calcOutput(listWeights7, cellValues), 7);
-        allOutputs.put(this.calcOutput(listWeights8, cellValues), 8);
-        allOutputs.put(this.calcOutput(listWeights9, cellValues), 9);
+           for (int i = 0; i < 10; i++) {
+                   allOutputs.put(this.calcOutput(initialWeights.get(i), cellValues), i);
+           }
 
         System.out.println("This number is "
                 + allOutputs.lastEntry().getValue());
