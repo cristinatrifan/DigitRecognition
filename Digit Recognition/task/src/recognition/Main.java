@@ -17,15 +17,17 @@ public class Main {
             }
 
         if (i == 1) {
-            //create random initial weights/read already existing weights
-            //calculate output neurons
-            //calculate delta weight for each possible grid - use file with weights
-            //save weights to file
+            // create random initial weights/read already existing weights
+            // calculate output neurons
+            // calculate delta weight for each possible grid - use file with weights
+            // save weights to file
+            for (int j = 0; j < 1000; j++) {
+                createCellsGrid();
+                obj.createInitialWeights();
+                //obj.writeDeltaWeights(obj.calculateDeltaWeights(obj.calculateOutputNeurons()));
+                obj.writeDeltaWeights(obj.calcWeights2());
 
-            createCellsGrid();
-            obj.createInitialWeights();
-            obj.writeDeltaWeights(obj.calculateDeltaWeights(obj.calculateOutputNeurons()));
-
+            }
         }
 
         else if (i == 2) {
@@ -46,17 +48,15 @@ public class Main {
 
         initialWeights = this.readDeltaWeights();
         if (initialWeights.size() <= 1) {
-
-   // Random random = new Random();
-
-    for (int i = 0; i < 10; i++) {
-        List<Double> initialWeightsList = new ArrayList<>();
-        for (int j = 0; j < 15; j++) {
-  //          initialWeightsList.add(random.nextDouble());
-            initialWeightsList.add(0.0);
-        }
-        initialWeights.put(i, initialWeightsList);
-             }
+             Random random = new Random();
+            for (int i = 0; i < 10; i++) {
+                List<Double> initialWeightsList = new ArrayList<>();
+                for (int j = 0; j < 15; j++) {
+                 initialWeightsList.add(random.nextGaussian());
+                //    initialWeightsList.add(0.0);
+                }
+                initialWeights.put(i, initialWeightsList);
+            }
         }
     }
 
@@ -68,10 +68,10 @@ public class Main {
         for (int i = 0; i < 10; i++) {
             Double outputNeuron = 0.0;
             for (int j = 0; j < 15; j++) {
-                outputNeuron += mapCellsGrid.get(i).get(j) * initialWeights.get(i).get(j);
+                outputNeuron = outputNeuron + (mapCellsGrid.get(i).get(j) * initialWeights.get(i).get(j));
             }
             //transform outputNeuron with sigmoid function
-            outputNeuron = 1 / (1 + Math.pow(Math.E, -outputNeuron));
+            outputNeuron = 1 / (1 + Math.pow(Math.E, (outputNeuron * -1)));
             //add neuron value to neuron list
             outputNeurons.put(i, outputNeuron);
         }
@@ -92,16 +92,70 @@ public class Main {
                     Double deltaanon = 0.00;
                     //for each activation value of the number we are testing
                     for (int k = 0; k < 10; k++) {
-                        deltaanon =+ 0.5 * mapCellsGrid.get(k).get(j)
-                            * (mapCellsGrid.get(i).get(j) - outputNeurons.get(i));
-                }
+                        deltaanon = deltaanon + (0.5 * mapCellsGrid.get(k).get(j)
+                            * (mapCellsGrid.get(i).get(j) - outputNeurons.get(i)));
+                    }
                     deltaanon = initialWeights.get(i).get(j) + deltaanon / 10;
                     listdeltaWeights.add(deltaanon);
-            }
+                }
                 mapDeltaWeights.put(i, listdeltaWeights);
         }
 
         return mapDeltaWeights;
+    }
+
+    private Map<Integer, List<Double>> calcWeights2() {
+        Map<Integer, List<Double>> mapDeltaWeights = new HashMap<>();
+        Map<Integer, List<Double>> mapWeights = new HashMap<>();
+        Map<Integer, Double> outputNeurons = new HashMap<Integer, Double>();
+
+        //calculate based on formula On = S(isCelActiven * initialWeight)
+        for (int i = 0; i < 10; i++) {
+            Double outputNeuron = 0.0;
+            for (int j = 0; j < 15; j++) {
+                outputNeuron = outputNeuron + (mapCellsGrid.get(i).get(j)
+                        * initialWeights.get(i).get(j));
+            }
+            //transform outputNeuron with sigmoid function
+            outputNeuron = 1 / (1 + Math.pow(Math.E, (outputNeuron * -1)));
+            //add neuron value to neuron list
+           // outputNeurons.put(i, outputNeuron);
+        }
+        // for each output neuron
+
+        for (int x = 0;x < 10; x++) {
+            List<Double> listWeights = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+
+                Double outputNeuron = 0.0;
+                List<Double> listdeltaWeights = new ArrayList<>();
+                //for each ideal value of gridcells of the neuron
+                for (int y = 0; y < 15; y++) {
+                    outputNeuron += mapCellsGrid.get(i).get(y)
+                            * initialWeights.get(x).get(y);
+                }
+                outputNeuron = 1 / (1 + Math.pow(Math.E, (outputNeuron * -1)));
+
+                for (int a = 0; a < 15; a++) {
+                    Double deltaanon = 0.00;
+                    int ideal = x == i ? 1 : 0;
+                    deltaanon = 0.5 * mapCellsGrid.get(i).get(a) * (ideal - outputNeuron);
+                    listdeltaWeights.add(deltaanon);
+                }
+                mapDeltaWeights.put(i, listdeltaWeights);
+            }
+
+                    for (int r = 0; r < 15; r++) {
+                        Double mean = 0.0;
+                        for (int d = 0; d < 10; d++) {
+                            mean +=mapDeltaWeights.get(d).get(r);
+                        }
+                        listWeights.add(mean / 10);
+                    }
+                        mapWeights.put(x, listWeights);
+            }
+
+        return mapWeights;
     }
 
     private void writeDeltaWeights(Map<Integer, List<Double>> mapDeltaWeights) {
@@ -214,23 +268,30 @@ public class Main {
         int index = 0 ;
 
         while (index < 15) {
-            output += listWeighs.get(index) * cellValues.get(index);
+            output = output + (listWeighs.get(index) * cellValues.get(index));
             index++;
         }
 
-        output = 1 / (1 + Math.pow(Math.E, -output));
+       // double outint = output * -1;
+       // double pow = Math.pow(Math.E, outint);
+       // output = 1 / (1 + Math.pow(Math.E, (output * -1)));
+
         return output;
     }
 
     private void calcBestFit(ArrayList<Integer> cellValues) {
            TreeMap<Double, Integer> allOutputs
                    = new TreeMap<Double, Integer>();
+        double[] arr = new double[15];
 
-           for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
                    allOutputs.put(this.calcOutput(initialWeights.get(i), cellValues), i);
-           }
+                   arr[i] = this.calcOutput(initialWeights.get(i), cellValues);
+        }
+
+        Arrays.sort(arr);
 
         System.out.println("This number is "
-                + allOutputs.lastEntry().getValue());
+                + allOutputs.get(allOutputs.lastKey()));
     }
 }
