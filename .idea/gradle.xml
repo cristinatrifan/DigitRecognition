@@ -12,6 +12,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Digit Recognition/task" />
+            <option value="$PROJECT_DIR$/Problems/An anonymous class with three methods" />
+            <option value="$PROJECT_DIR$/Problems/Convert to byte array" />
+            <option value="$PROJECT_DIR$/Problems/Iterations" />
+            <option value="$PROJECT_DIR$/Problems/Max of two integers" />
+            <option value="$PROJECT_DIR$/Problems/Pow" />
+            <option value="$PROJECT_DIR$/Problems/Returning from a method" />
             <option value="$PROJECT_DIR$/util" />
           </set>
         </option>
